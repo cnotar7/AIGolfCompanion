@@ -14,14 +14,18 @@ import java.util.List;
 @AllArgsConstructor
 public class Course {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-    private String location;
-    private Integer holesCount;
+    private String clubName;
+    private String address;
+    private String city;
+    private String state;
+    private String country;
+    private double latitude;
+    private double longitude;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-    private List<Hole> holes;
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tee> tees;
 }
 

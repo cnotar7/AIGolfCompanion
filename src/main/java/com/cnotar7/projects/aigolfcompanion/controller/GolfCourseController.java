@@ -1,5 +1,6 @@
 package com.cnotar7.projects.aigolfcompanion.controller;
 
+import com.cnotar7.projects.aigolfcompanion.dto.CourseDetailDTO;
 import com.cnotar7.projects.aigolfcompanion.dto.CourseSummaryDTO;
 import com.cnotar7.projects.aigolfcompanion.model.Course;
 import com.cnotar7.projects.aigolfcompanion.service.GolfCourseService;
@@ -20,16 +21,20 @@ public class GolfCourseController {
     public ResponseEntity<List<CourseSummaryDTO>> searchGolfCourses(@RequestParam String query) {
         List<CourseSummaryDTO> courseSummaries = golfCourseService.searchGolfCourse(query);
         if (courseSummaries.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok(courseSummaries);
         }
     }
-/*
+
     @GetMapping("/select/{id}")
-    public ResponseEntity<Course> selectGolfCourseById(@PathVariable Integer id) {
-        return golfCourseService.selectCourse(id);
+    public ResponseEntity<CourseDetailDTO> selectGolfCourseById(@PathVariable Long id) {
+        CourseDetailDTO courseDetailDTO = golfCourseService.getGolfCourseById(id);
+        if (courseDetailDTO == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(courseDetailDTO);
+        }
     }
 
- */
 }

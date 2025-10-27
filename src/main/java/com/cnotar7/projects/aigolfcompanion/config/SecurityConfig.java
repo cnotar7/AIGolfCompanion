@@ -26,9 +26,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for REST APIs
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**")) // For H2 Database Debugging
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // For H2 Database Debugging
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT is stateless
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/golfcompanion/auth/**").permitAll() // public endpoints
+                        .requestMatchers("/golfcompanion/courses/**").permitAll() // public endpoints
+                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated() // all other endpoints require authentication
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

@@ -14,11 +14,11 @@ public class Hole {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int holeNumber;
     private int par;
-    private int distanceYards;
+    private int yardage;
+    private int handicap;
 
     @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
+    @JoinColumn(name = "tee_id") // foreign key column in hole table
+    private Tee tee;
 }

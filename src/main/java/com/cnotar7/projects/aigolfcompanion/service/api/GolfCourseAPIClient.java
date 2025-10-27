@@ -1,6 +1,7 @@
 package com.cnotar7.projects.aigolfcompanion.service.api;
 
 import com.cnotar7.projects.aigolfcompanion.dto.external.ExternalCourse;
+import com.cnotar7.projects.aigolfcompanion.dto.external.ExternalCourseResponse;
 import com.cnotar7.projects.aigolfcompanion.dto.external.ExternalCourseSearchResponse;
 import com.cnotar7.projects.aigolfcompanion.model.Course;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -24,8 +26,14 @@ public class GolfCourseAPIClient {
     private RestTemplate restTemplate;
 
     public List<ExternalCourse> searchGolfCourse(String query) {
-        String url = this.baseUrl + "?search_query=" + query;
+        String url = this.baseUrl + "search?search_query=" + query;
         ExternalCourseSearchResponse response = this.restTemplate.getForObject(url, ExternalCourseSearchResponse.class);
         return response != null ? response.getCourses() : new ArrayList<>();
+    }
+
+    public ExternalCourse getGolfCourseById(Long id) {
+        String url = this.baseUrl + "courses/" + id;
+        ExternalCourseResponse response = this.restTemplate.getForObject(url, ExternalCourseResponse.class);
+        return response != null ? response.getCourse() : null;
     }
 }
