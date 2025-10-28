@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,17 +23,17 @@ public class Round {
     private String weather;
     private boolean completed;
 
-    @OneToOne
+    @ManyToOne
     private Course course;
 
     @ManyToOne
     private User user;
 
-    @OneToMany(mappedBy = "round", cascade = CascadeType.ALL)
-    private List<Shot> shots;
 
-    @OneToOne(mappedBy = "round", cascade = CascadeType.ALL)
-    private AISummary aiSummary;
+    @OneToMany(mappedBy = "round", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoundHole> holes = new ArrayList<>();
 
+    @Lob // large text
+    private String aiSummary; // JSON or plain text summary
 
 }

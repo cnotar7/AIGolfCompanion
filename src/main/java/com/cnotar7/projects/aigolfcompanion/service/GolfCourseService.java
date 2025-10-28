@@ -1,5 +1,6 @@
 package com.cnotar7.projects.aigolfcompanion.service;
 
+import com.cnotar7.projects.aigolfcompanion.converter.GolfCourseObjectConverter;
 import com.cnotar7.projects.aigolfcompanion.dto.CourseDetailDTO;
 import com.cnotar7.projects.aigolfcompanion.dto.HoleDTO;
 import com.cnotar7.projects.aigolfcompanion.dto.TeeDTO;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -24,6 +24,7 @@ public class GolfCourseService {
 
     private final GolfCourseAPIClient golfCourseAPIClient;
     private final CourseRepository courseRepository;
+    private final GolfCourseObjectConverter golfCourseObjectConverter;
 
     public List<CourseSummaryDTO> searchGolfCourse(String query) {
         List<ExternalCourse> courses = golfCourseAPIClient.searchGolfCourse(query);
@@ -33,14 +34,14 @@ public class GolfCourseService {
         }
 
         return courses.stream()
-                .map(course -> new CourseSummaryDTO(
-                        course.getId(),
-                        course.getCourse_name(),
-                        course.getLocation().getCity(),
-                        course.getLocation().getState(),
-                        course.getLocation().getCountry()
-
-                )).toList();
+                .map(course -> CourseSummaryDTO.builder()
+                        .id(course.getId())
+                        .name(course.getCourse_name())
+                        .city(course.getLocation().getCity())
+                        .state(course.getLocation().getState())
+                        .country(course.getLocation().getCountry())
+                        .build())
+                .toList();
     }
 
     public CourseDetailDTO getGolfCourseById(Long id) {
@@ -52,7 +53,7 @@ public class GolfCourseService {
             ExternalCourse externalCourse = golfCourseAPIClient.getGolfCourseById(id);
             System.out.println("sdsdfg");
             if (externalCourse != null) {
-                course = mapExternalCourseToEntity(externalCourse);
+                course = golfCourseObjectConverter.mapExternalCourseToEntity(externalCourse);
                 System.out.println("ghjghjd");
                 courseRepository.save(course);
                 System.out.println("htrrcsdv");
@@ -62,21 +63,22 @@ public class GolfCourseService {
 
         }
 
-        return mapEntityToDTO(course);
+        return golfCourseObjectConverter.mapCourseEntityToDTO(course);
     }
 
     private Course mapExternalCourseToEntity(ExternalCourse ext) {
         System.out.println("External Course!!! " + ext);
-        Course course = new Course();
-        course.setId(ext.getId());
-        course.setName(ext.getCourse_name());
-        course.setClubName(ext.getClub_name());
-        course.setAddress(ext.getLocation().getAddress());
-        course.setCity(ext.getLocation().getCity());
-        course.setState(ext.getLocation().getState());
-        course.setCountry(ext.getLocation().getCountry());
-        course.setLatitude(ext.getLocation().getLatitude());
-        course.setLongitude(ext.getLocation().getLongitude());
+        Course course = Course.builder()
+                .id(ext.getId())
+                .name(ext.getCourse_name())
+                .clubName(ext.getClub_name())
+                .city(ext.getLocation().getCity())
+                .state(ext.getLocation().getState())
+                .country(ext.getLocation().getCountry())
+                .address(ext.getLocation().getAddress())
+                .latitude(ext.getLocation().getLatitude())
+                .longitude(ext.getLocation().getLongitude())
+                .build();
 
         List<Tee> teeEntities = new ArrayList<>();
         if (ext.getTees() != null) {
@@ -93,53 +95,65 @@ public class GolfCourseService {
     }
 
     private Tee mapTee(ExternalCourse.Tee t, Course course, Gender gender) {
-        Tee tee = new Tee();
-        tee.setTeeName(t.getTee_name());
-        tee.setParTotal(t.getPar_total());
-        tee.setTotalYards(t.getTotal_yards());
-        tee.setGender(gender);
-        tee.setCourse(course);
+        Tee tee = Tee.builder()
+                .teeName(t.getTee_name())
+                .parTotal(t.getPar_total())
+                .totalYards(t.getTotal_yards())
+                .gender(gender)
+                .course(course)
+                .build();
 
-        List<Hole> holeEntities = t.getHoles().stream().map(h -> {
-            Hole hole = new Hole();
-            hole.setPar(h.getPar());
-            hole.setYardage(h.getYardage());
-            hole.setHandicap(h.getHandicap());
-            hole.setTee(tee);
-            return hole;
-        }).collect(Collectors.toList());
+        List<Hole> holeEntities = t.getHoles().stream()
+                .map(h -> Hole.builder()
+                        .par(h.getPar())
+                        .yardage(h.getYardage())
+                        .handicap(h.getHandicap())
+                        .tee(tee)
+                        .build())
+                .toList();
 
         tee.setHoles(holeEntities);
         return tee;
     }
 
-    public CourseDetailDTO mapEntityToDTO(Course course) {
-        CourseDetailDTO dto = new CourseDetailDTO();
-        dto.setId(course.getId());
-        dto.setName(course.getName());
-        dto.setAddress(course.getAddress());
-        dto.setCity(course.getCity());
-        dto.setState(course.getState());
-        dto.setCountry(course.getCountry());
+    public CourseDetailDTO mapCourseEntityToDTO(Course course) {
+        CourseDetailDTO dto = CourseDetailDTO.builder()
+                .id(course.getId())
+                .name(course.getName())
+                .city(course.getCity())
+                .country(course.getCountry())
+                .address(course.getAddress())
+                .latitude(course.getLatitude())
+                .longitude(course.getLongitude())
+                .build();
 
-        List<TeeDTO> teeDTOs = course.getTees().stream().map(tee -> {
-            TeeDTO tDto = new TeeDTO();
-            tDto.setTeeName(tee.getTeeName());
-            tDto.setParTotal(tee.getParTotal());
-            tDto.setTotalYards(tee.getTotalYards());
-            tDto.setGender(tee.getGender());
-            tDto.setHoles(tee.getHoles().stream().map(h -> {
-                HoleDTO hDto = new HoleDTO();
-                hDto.setPar(h.getPar());
-                hDto.setYardage(h.getYardage());
-                hDto.setHandicap(h.getHandicap());
-                return hDto;
-            }).collect(Collectors.toList()));
-            return tDto;
-        }).collect(Collectors.toList());
+        List<TeeDTO> teeDTOs = course.getTees().stream()
+                .map(this::mapTeeEntityToDTO)
+                .toList();
 
         dto.setTees(teeDTOs);
         return dto;
+    }
+
+    public TeeDTO mapTeeEntityToDTO(Tee tee) {
+        return TeeDTO.builder()
+                .teeName(tee.getTeeName())
+                .courseRating(tee.getCourseRating())
+                .totalYards(tee.getTotalYards())
+                .parTotal(tee.getParTotal())
+                .gender(tee.getGender())
+                .holes(tee.getHoles().stream()
+                        .map(this::mapHoleEntityToDTO)
+                        .toList())
+                .build();
+    }
+
+    public HoleDTO mapHoleEntityToDTO(Hole hole) {
+        return HoleDTO.builder()
+                .handicap(hole.getHandicap())
+                .par(hole.getPar())
+                .yardage(hole.getYardage())
+                .build();
     }
 
 

@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class HoleDTO {
-    private int par;
-    private int yardage;
-    private int handicap;
+public class ShotDTO {
+    private String club;
+    private int distanceYards;
+    private String result;
 }
