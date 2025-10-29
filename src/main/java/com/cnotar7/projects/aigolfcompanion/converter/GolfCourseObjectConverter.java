@@ -1,6 +1,7 @@
 package com.cnotar7.projects.aigolfcompanion.converter;
 
 import com.cnotar7.projects.aigolfcompanion.dto.CourseDetailDTO;
+import com.cnotar7.projects.aigolfcompanion.dto.CourseSummaryDTO;
 import com.cnotar7.projects.aigolfcompanion.dto.HoleDTO;
 import com.cnotar7.projects.aigolfcompanion.dto.TeeDTO;
 import com.cnotar7.projects.aigolfcompanion.dto.external.ExternalCourse;
@@ -107,6 +108,16 @@ public class GolfCourseObjectConverter {
                 .yardage(h.getYardage())
                 .handicap(h.getHandicap())
                 .tee(tee)
+                .build();
+    }
+
+    public CourseSummaryDTO mapExternalCoursetoDTO(ExternalCourse ext) {
+        return CourseSummaryDTO.builder()
+                .id(ext.getId())
+                .name(ext.getCourse_name())
+                .city(ext.getLocation().getCity())
+                .state(ext.getLocation().getState())
+                .country(ext.getLocation().getCountry())
                 .build();
     }
 }

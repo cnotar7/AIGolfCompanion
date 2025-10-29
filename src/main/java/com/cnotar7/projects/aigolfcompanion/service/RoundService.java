@@ -1,9 +1,11 @@
 package com.cnotar7.projects.aigolfcompanion.service;
 
 import com.cnotar7.projects.aigolfcompanion.dto.HoleShotsDTO;
+import com.cnotar7.projects.aigolfcompanion.dto.StartRoundDTO;
 import com.cnotar7.projects.aigolfcompanion.model.Round;
 import com.cnotar7.projects.aigolfcompanion.model.RoundHole;
 import com.cnotar7.projects.aigolfcompanion.model.Shot;
+import com.cnotar7.projects.aigolfcompanion.repository.CourseRepository;
 import com.cnotar7.projects.aigolfcompanion.repository.RoundRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 public class RoundService {
 
     private RoundRepository roundRepository;
+    private CourseRepository courseRepository;
 
     public RoundHole addShotsToRound(Long roundId, HoleShotsDTO holeShotsDTO) {
         Round round = roundRepository.findById(roundId).orElseThrow(() -> new RuntimeException("Round not found"));
@@ -49,4 +52,5 @@ public class RoundService {
         roundRepository.save(round);
         return roundHole;
     }
+
 }

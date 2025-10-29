@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,10 @@ public class Round {
     private LocalDate date;
     private String weather;
     private boolean completed;
+
+    @Min(1)
+    @Max(18)
+    private int currentHoleNumber;
 
     @ManyToOne
     private Course course;

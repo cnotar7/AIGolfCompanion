@@ -21,6 +21,10 @@ public class RoundHole {
     private Long id;
 
     private int holeNumber;
+    private int par;
+    private int strokes;
+    private int putts;
+    private boolean completed;
 
     @ManyToOne
     @JoinColumn(name = "round_id")
