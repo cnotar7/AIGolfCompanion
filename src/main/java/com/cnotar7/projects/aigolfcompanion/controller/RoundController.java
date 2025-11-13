@@ -22,14 +22,22 @@ public class RoundController {
     private RoundService roundService;
 
     @PostMapping("/start")
-    public ResponseEntity<StartRoundResponseDTO> startNewRound(@RequestBody StartRoundDTO startRoundDTO) {
-
-        return ResponseEntity.ok(new StartRoundResponseDTO());
+    public ResponseEntity<RoundResponseDTO> startNewRound(@RequestBody StartRoundDTO startRoundDTO) {
+        RoundResponseDTO roundResponseDTO = roundService.startNewRound(startRoundDTO);
+        if (roundResponseDTO == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(roundResponseDTO);
     }
 
     @GetMapping("/{roundId}/current")
-    public ResponseEntity<Hole> getCurrentHole(@PathVariable Long roundId) {
-        return ResponseEntity.ok(new Hole());
+    public ResponseEntity<RoundHoleDTO> getCurrentHole(@PathVariable Long roundId) {
+        RoundHoleDTO roundHoleDTO = roundService.getCurrentHoleForRound(roundId);
+        if (roundHoleDTO == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(roundHoleDTO);
     }
 
     @GetMapping("/{roundId}/hole/{holeNumber}")

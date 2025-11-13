@@ -26,13 +26,11 @@ public class GolfCourseObjectConverter {
                 .address(course.getAddress())
                 .latitude(course.getLatitude())
                 .longitude(course.getLongitude())
+                .tees(course.getTees().stream()
+                        .map(this::mapTeeEntityToDTO)
+                        .toList())
                 .build();
 
-        List<TeeDTO> teeDTOs = course.getTees().stream()
-                .map(this::mapTeeEntityToDTO)
-                .toList();
-
-        dto.setTees(teeDTOs);
         return dto;
     }
 

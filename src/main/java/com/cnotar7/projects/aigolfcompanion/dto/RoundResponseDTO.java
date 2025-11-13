@@ -5,12 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class StartRoundResponseDTO {
+public class RoundResponseDTO {
     private Long roundId;
     private Long courseId;
-    private String message;
+    private String courseName;
+    private String userName;
+    private int currentHoleNumber;
+    private LocalDateTime startTime;
+    private boolean completed;
 }
