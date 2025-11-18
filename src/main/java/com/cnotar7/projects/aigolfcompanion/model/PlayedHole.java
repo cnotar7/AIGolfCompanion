@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RoundHole {
+public class PlayedHole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +30,6 @@ public class RoundHole {
     @JoinColumn(name = "round_id")
     private Round round;
 
-    @OneToMany(mappedBy = "roundHole", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "playedHole", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Shot> shots = new ArrayList<>();
 }

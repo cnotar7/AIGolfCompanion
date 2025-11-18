@@ -21,6 +21,6 @@ public class Shot {
     private String result;
 
     @ManyToOne
-    @JoinColumn(name = "round_hole_id")
-    private RoundHole roundHole;
+    @JoinColumn(name = "played_hole_id")
+    private PlayedHole playedHole;
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RoundHoleDTO {
+public class PlayedHoleDTO {
     private int holeNumber;
     private int par;
     private int strokes;

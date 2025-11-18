@@ -25,4 +25,10 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponseException(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(IndexOutOfBoundsException.class)
+    public ResponseEntity<ErrorResponse> handleIndexOutOfBoundsException(IndexOutOfBoundsException ex) {
+        ErrorResponse error = new ErrorResponseException(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }

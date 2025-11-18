@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class RoundResponseDTO {
     private Long roundId;
     private Long courseId;
+    private Long teeId;
     private String courseName;
     private String userName;
     private int currentHoleNumber;

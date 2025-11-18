@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Data
@@ -28,17 +28,21 @@ public class Round {
 
     @Min(1)
     @Max(18)
-    private int currentHoleNumber;
+    private int currentHoleNumber = 1;
 
     @ManyToOne
     private Course course;
+
+    @ManyToOne
+    private Tee selectedTee;
 
     @ManyToOne
     private User user;
 
 
     @OneToMany(mappedBy = "round", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RoundHole> holes = new ArrayList<>();
+    @MapKey(name = "holeNumber")
+    private Map<Integer, PlayedHole> holes = new HashMap<>();
 
     @Lob // large text
     private String aiSummary; // JSON or plain text summary
