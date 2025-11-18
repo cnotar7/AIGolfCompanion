@@ -3,10 +3,7 @@ package com.cnotar7.projects.aigolfcompanion.service;
 import com.cnotar7.projects.aigolfcompanion.converter.GolfRoundObjectConverter;
 import com.cnotar7.projects.aigolfcompanion.dto.*;
 import com.cnotar7.projects.aigolfcompanion.model.*;
-import com.cnotar7.projects.aigolfcompanion.repository.CourseRepository;
-import com.cnotar7.projects.aigolfcompanion.repository.PlayedHoleRepository;
-import com.cnotar7.projects.aigolfcompanion.repository.RoundRepository;
-import com.cnotar7.projects.aigolfcompanion.repository.UserRepository;
+import com.cnotar7.projects.aigolfcompanion.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +18,7 @@ public class RoundService {
     private CourseRepository courseRepository;
     private UserRepository userRepository;
     private PlayedHoleRepository playedholeRepository;
+    private ShotRepository shotRepository;
     private GolfRoundObjectConverter converter;
 
     public RoundResponseDTO startNewRound(StartRoundDTO startRoundDTO) {
@@ -64,20 +62,16 @@ public class RoundService {
             playedHoles.put(holeCounter++, playedHole);
         }
 
-
+        round.setHoles(playedHoles);
 
         Round savedRound = roundRepository.save(round);
-        RoundResponseDTO roundResponseDTO = RoundResponseDTO.builder()
-                .courseId(savedRound.getCourse().getId())
-                .roundId(savedRound.getId())
-                .teeId(savedRound.getSelectedTee().getId())
-                .courseName(savedRound.getCourse().getName())
-                .userName(user.getUsername())
-                .currentHoleNumber(1)
-                .startTime(now)
-                .completed(false)
-                .build();
-        return roundResponseDTO;
+        return converter.mapRoundEntityToDTO(savedRound, savedRound.getUser());
+    }
+
+    public RoundResponseDTO getRoundById(Long roundId) {
+        Round round = roundRepository.findById(roundId).orElseThrow(() ->
+                new MissingResourceException("Round not found", Round.class.getName(), roundId.toString()));
+        return converter.mapRoundEntityToDTO(round, round.getUser());
     }
 
 
@@ -95,7 +89,7 @@ public class RoundService {
     }
 
 
-    public PlayedHoleDTO addShotToHole(Long roundId, int holeNumber, ShotDTO shotDTO) {
+    public PlayedHoleDTO addShotToHole(Long roundId, Integer holeNumber, ShotDTO shotDTO) {
 
         Round round = roundRepository.findById(roundId).orElseThrow(() -> new RuntimeException("Round not found"));
         PlayedHole playedHole = round.getHoles().get(holeNumber);
@@ -109,6 +103,48 @@ public class RoundService {
         playedHole.getShots().add(newShot);
 
         playedholeRepository.save(playedHole);
+        return converter.mapPlayedHoleEntityToDTO(playedHole);
+    }
+
+    public PlayedHoleDTO updateShot(Long shotId,  ShotDTO shotDTO) {
+        Shot shotToUpdate = shotRepository.findById(shotId)
+                .orElseThrow(() -> new MissingResourceException("Shot not found", Shot.class.getName(), shotId.toString()));
+
+        PlayedHole playedHole = shotToUpdate.getPlayedHole();
+
+        if (playedHole == null) {
+            throw new IllegalStateException("Played Hole does not exist for this round");
+        }
+
+        shotToUpdate.setClub(shotDTO.getClub());
+        shotToUpdate.setDistanceYards(shotDTO.getDistanceYards());
+        shotToUpdate.setResult(shotDTO.getResult());
+
+        shotRepository.save(shotToUpdate);
+
+        return converter.mapPlayedHoleEntityToDTO(playedHole);
+    }
+
+    public PlayedHoleDTO deleteShot(Long shotId) {
+        Shot shotToDelete = shotRepository.findById(shotId)
+                .orElseThrow(() -> new MissingResourceException("Shot not found", Shot.class.getName(), shotId.toString()));
+
+        PlayedHole playedHole = shotToDelete.getPlayedHole();
+
+        if (playedHole == null) {
+            throw new IllegalStateException("Played Hole does not exist for this round");
+        }
+
+        // 2. Remove the shot from the hole’s list
+        boolean removed = playedHole.getShots().removeIf(s -> s.getId().equals(shotId));
+
+        if (!removed) {
+            throw new IllegalStateException("Shot exists but was not in PlayedHole.shots list");
+        }
+
+        playedholeRepository.save(playedHole);
+        shotRepository.delete(shotToDelete);
+
         return converter.mapPlayedHoleEntityToDTO(playedHole);
     }
 

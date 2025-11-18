@@ -19,7 +19,7 @@ public class RoundController {
 
     private RoundService roundService;
 
-    @PostMapping("/start")
+    @PostMapping()
     public ResponseEntity<RoundResponseDTO> startNewRound(@RequestBody StartRoundDTO startRoundDTO) {
         RoundResponseDTO roundResponseDTO = roundService.startNewRound(startRoundDTO);
         if (roundResponseDTO == null) {
@@ -28,7 +28,16 @@ public class RoundController {
         return ResponseEntity.ok(roundResponseDTO);
     }
 
-    @GetMapping("/{roundId}/current")
+    @GetMapping("/{roundId}")
+    public ResponseEntity<RoundResponseDTO> getRoundById(@PathVariable("roundId") Long roundId) {
+        RoundResponseDTO roundResponseDTO = roundService.getRoundById(roundId);
+        if (roundResponseDTO == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(roundResponseDTO);
+    }
+
+    @GetMapping("/{roundId}/holes/current")
     public ResponseEntity<PlayedHoleDTO> getCurrentHole(@PathVariable Long roundId) {
         PlayedHoleDTO playedHoleDTO = roundService.getHoleForRound(roundId, null);
         if (playedHoleDTO == null) {
@@ -38,7 +47,7 @@ public class RoundController {
         return ResponseEntity.ok(playedHoleDTO);
     }
 
-    @GetMapping("/{roundId}/hole/{holeNumber}")
+    @GetMapping("/{roundId}/holes/{holeNumber}")
     public ResponseEntity<PlayedHoleDTO> getSpecificHole(@PathVariable Long roundId, @PathVariable int holeNumber) {
         PlayedHoleDTO playedHoleDTO = roundService.getHoleForRound(roundId, holeNumber);
         if (playedHoleDTO == null) {
@@ -48,7 +57,7 @@ public class RoundController {
         return ResponseEntity.ok(playedHoleDTO);
     }
 
-    @PostMapping("/{roundId}/hole/{holeNumber}/shot")
+    @PostMapping("/{roundId}/holes/{holeNumber}/shots")
     public ResponseEntity<PlayedHoleDTO> addShotToHole(
             @PathVariable Long roundId, @PathVariable @Min(1) @Max(18) Integer holeNumber, @RequestBody ShotDTO shotDTO) {
         PlayedHoleDTO playedHole = roundService.addShotToHole(roundId, holeNumber, shotDTO);
@@ -56,19 +65,32 @@ public class RoundController {
         return ResponseEntity.ok(playedHole);
     }
 
-    @PostMapping("{roundId}/hole/next")
+    @PostMapping("/shots/{shotId}")
+    public ResponseEntity<PlayedHoleDTO> updateShot(@PathVariable Long shotId, @RequestBody ShotDTO shotDTO) {
+        PlayedHoleDTO playedHole = roundService.updateShot(shotId, shotDTO);
+        return ResponseEntity.ok(playedHole);
+    }
+
+    @DeleteMapping("/shots/{shotId}")
+    public ResponseEntity<PlayedHoleDTO> deleteShot(@PathVariable Long shotId) {
+        PlayedHoleDTO playedHole = roundService.deleteShot(shotId);
+
+        return ResponseEntity.ok(playedHole);
+    }
+
+    @PostMapping("/{roundId}/holes/next")
     public ResponseEntity<PlayedHoleDTO> moveToNextHole(@PathVariable Long roundId) {
         PlayedHoleDTO nextHole = roundService.moveToNextHole(roundId);
         return ResponseEntity.ok(nextHole);
     }
 
-    @PostMapping("{roundId}/hole/previous")
+    @PostMapping("/{roundId}/holes/previous")
     public ResponseEntity<PlayedHoleDTO> moveToPreviousHole(@PathVariable Long roundId) {
         PlayedHoleDTO previousHole = roundService.moveToPreviousHole(roundId);
         return ResponseEntity.ok(previousHole);
     }
 
-    @PostMapping("{roundId}/complete")
+    @PostMapping("/{roundId}/complete")
     public ResponseEntity<Round> completeRound(@PathVariable Long roundId) {
         return ResponseEntity.ok(new Round());
     }
