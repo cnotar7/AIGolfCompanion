@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GolfRoundObjectConverter {
-    public RoundResponseDTO mapRoundEntityToDTO(Round round, User user) {
+    public RoundResponseDTO mapRoundEntityToDTO(Round round) {
         return RoundResponseDTO.builder()
                 .courseId(round.getCourse().getId())
                 .roundId(round.getId())
                 .teeId(round.getSelectedTee().getId())
                 .courseName(round.getCourse().getName())
-                .userName(user.getUsername())
+                .userName(round.getUser().getUsername())
                 .currentHoleNumber(round.getCurrentHoleNumber())
                 .startTime(round.getStartTime())
                 .completed(round.isCompleted())
@@ -39,7 +39,7 @@ public class GolfRoundObjectConverter {
     public ShotDTO mapShotEntityToDTO(Shot shot) {
         return ShotDTO.builder()
                 .club(shot.getClub())
-                .distanceYards(shot.getDistanceYards())
+                .shotNumber(shot.getShotNumber())
                 .result(shot.getResult())
                 .build();
     }
@@ -47,7 +47,7 @@ public class GolfRoundObjectConverter {
     public Shot mapShotDTOToEntity(ShotDTO shotDTO, PlayedHole playedHole) {
         return Shot.builder()
                 .club(shotDTO.getClub())
-                .distanceYards(shotDTO.getDistanceYards())
+                .shotNumber(shotDTO.getShotNumber())
                 .result(shotDTO.getResult())
                 .playedHole(playedHole)
                 .build();

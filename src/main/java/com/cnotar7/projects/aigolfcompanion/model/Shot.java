@@ -16,8 +16,8 @@ public class Shot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private int shotNumber;
     private String club;
-    private int distanceYards;
     private String result;
 
     @ManyToOne

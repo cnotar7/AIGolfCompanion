@@ -19,6 +19,7 @@ public class RoundService {
     private UserRepository userRepository;
     private PlayedHoleRepository playedholeRepository;
     private ShotRepository shotRepository;
+    private RoundSummaryService roundSummaryService;
     private GolfRoundObjectConverter converter;
 
     public RoundResponseDTO startNewRound(StartRoundDTO startRoundDTO) {
@@ -65,13 +66,13 @@ public class RoundService {
         round.setHoles(playedHoles);
 
         Round savedRound = roundRepository.save(round);
-        return converter.mapRoundEntityToDTO(savedRound, savedRound.getUser());
+        return converter.mapRoundEntityToDTO(savedRound);
     }
 
     public RoundResponseDTO getRoundById(Long roundId) {
         Round round = roundRepository.findById(roundId).orElseThrow(() ->
                 new MissingResourceException("Round not found", Round.class.getName(), roundId.toString()));
-        return converter.mapRoundEntityToDTO(round, round.getUser());
+        return converter.mapRoundEntityToDTO(round);
     }
 
 
@@ -117,7 +118,7 @@ public class RoundService {
         }
 
         shotToUpdate.setClub(shotDTO.getClub());
-        shotToUpdate.setDistanceYards(shotDTO.getDistanceYards());
+        shotToUpdate.setShotNumber(shotDTO.getShotNumber());
         shotToUpdate.setResult(shotDTO.getResult());
 
         shotRepository.save(shotToUpdate);
@@ -195,6 +196,18 @@ public class RoundService {
         roundRepository.save(round);
 
         return converter.mapPlayedHoleEntityToDTO(round.getHoles().get(currentHoleNumber));
+
+    }
+
+    public RoundResponseDTO completeRound(Long roundId) {
+        Round round = roundRepository.findById(roundId).orElseThrow(() ->
+                new MissingResourceException("Round not found", Round.class.getName(), roundId.toString()));
+
+        String AiSummary = roundSummaryService.generateAiSummary(round);
+        round.setAiSummary(AiSummary);
+        round.setCompleted(true);
+        roundRepository.save(round);
+        return converter.mapRoundEntityToDTO(round);
 
     }
 

@@ -65,7 +65,7 @@ public class RoundController {
         return ResponseEntity.ok(playedHole);
     }
 
-    @PostMapping("/shots/{shotId}")
+    @PutMapping("/shots/{shotId}")
     public ResponseEntity<PlayedHoleDTO> updateShot(@PathVariable Long shotId, @RequestBody ShotDTO shotDTO) {
         PlayedHoleDTO playedHole = roundService.updateShot(shotId, shotDTO);
         return ResponseEntity.ok(playedHole);
@@ -91,8 +91,9 @@ public class RoundController {
     }
 
     @PostMapping("/{roundId}/complete")
-    public ResponseEntity<Round> completeRound(@PathVariable Long roundId) {
-        return ResponseEntity.ok(new Round());
+    public ResponseEntity<RoundResponseDTO> completeRound(@PathVariable Long roundId) {
+        RoundResponseDTO roundResponseDTO = roundService.completeRound(roundId);
+        return ResponseEntity.ok(roundResponseDTO);
     }
 
 

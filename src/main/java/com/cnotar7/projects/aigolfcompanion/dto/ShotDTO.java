@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ShotDTO {
     private String club;
-    private int distanceYards;
+    private int shotNumber;
     private String result;
 }

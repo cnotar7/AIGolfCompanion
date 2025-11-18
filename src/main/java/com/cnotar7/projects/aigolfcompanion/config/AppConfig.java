@@ -1,5 +1,7 @@
 package com.cnotar7.projects.aigolfcompanion.config;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,5 +27,10 @@ public class AppConfig {
 
         restTemplate.setInterceptors(List.of(interceptor));
         return restTemplate;
+    }
+
+    @Bean
+    public ChatClient openAiChatClient(OpenAiChatModel chatModel) {
+        return ChatClient.create(chatModel);
     }
 }
