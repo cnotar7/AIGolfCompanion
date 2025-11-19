@@ -20,11 +20,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtAuthFilter jwtAuthFilter;
+    //private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for REST APIs
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 console
+
+                // Allow all requests without authentication
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                );
+                /*
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for REST APIs
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**")) // For H2 Database Debugging
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // For H2 Database Debugging
@@ -32,12 +40,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT is stateless
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/golfcompanion/auth/**").permitAll() // public endpoints
-                        .requestMatchers("/golfcompanion/courses/**").permitAll() // public endpoints
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated() // all other endpoints require authentication
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+*/
         return http.build();
     }
 

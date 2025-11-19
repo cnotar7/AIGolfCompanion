@@ -6,7 +6,6 @@ import com.cnotar7.projects.aigolfcompanion.dto.ShotDTO;
 import com.cnotar7.projects.aigolfcompanion.model.PlayedHole;
 import com.cnotar7.projects.aigolfcompanion.model.Round;
 import com.cnotar7.projects.aigolfcompanion.model.Shot;
-import com.cnotar7.projects.aigolfcompanion.model.User;
 import org.springframework.stereotype.Component;
 
 @Component

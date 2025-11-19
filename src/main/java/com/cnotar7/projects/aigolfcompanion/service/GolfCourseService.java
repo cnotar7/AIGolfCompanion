@@ -2,20 +2,13 @@ package com.cnotar7.projects.aigolfcompanion.service;
 
 import com.cnotar7.projects.aigolfcompanion.converter.GolfCourseObjectConverter;
 import com.cnotar7.projects.aigolfcompanion.dto.CourseDetailDTO;
-import com.cnotar7.projects.aigolfcompanion.dto.HoleDTO;
-import com.cnotar7.projects.aigolfcompanion.dto.TeeDTO;
-import com.cnotar7.projects.aigolfcompanion.enums.Gender;
 import com.cnotar7.projects.aigolfcompanion.model.Course;
-import com.cnotar7.projects.aigolfcompanion.model.Hole;
-import com.cnotar7.projects.aigolfcompanion.model.Tee;
 import com.cnotar7.projects.aigolfcompanion.repository.CourseRepository;
 import com.cnotar7.projects.aigolfcompanion.service.api.GolfCourseAPIClient;
 import com.cnotar7.projects.aigolfcompanion.dto.CourseSummaryDTO;
 import com.cnotar7.projects.aigolfcompanion.dto.external.ExternalCourse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

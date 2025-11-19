@@ -2,7 +2,7 @@ package com.cnotar7.projects.aigolfcompanion.dto.external;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
 import lombok.Data;
 
 @Data

@@ -2,8 +2,6 @@ package com.cnotar7.projects.aigolfcompanion.controller;
 
 
 import com.cnotar7.projects.aigolfcompanion.dto.*;
-import com.cnotar7.projects.aigolfcompanion.model.Round;
-import com.cnotar7.projects.aigolfcompanion.model.PlayedHole;
 import com.cnotar7.projects.aigolfcompanion.service.RoundService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
