@@ -87,7 +87,7 @@ public class GolfCourseServiceTest {
     @Test
     void getGolfCourseByIdRepoFound() {
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
-
+        when(golfCourseObjectConverter.mapCourseEntityToDTO(course)).thenReturn(detailDTO);
         CourseDetailDTO result = golfCourseService.getGolfCourseById(1L);
 
         assertThat(result.getName()).isEqualTo("Arcadia Bluffs Gc");
@@ -96,10 +96,13 @@ public class GolfCourseServiceTest {
 
     @Test
     void getGolfCourseByIdAPIFound() {
-        when(courseRepository.findById(1L)).thenReturn(null);
+        when(courseRepository.findById(1L)).thenReturn(Optional.empty());
         when(golfCourseAPIClient.getGolfCourseById(1L)).thenReturn(externalCourse);
         when(golfCourseObjectConverter.mapExternalCourseToEntity(externalCourse)).thenReturn(course);
+
         when(courseRepository.save(course)).thenReturn(course);
+        when(golfCourseObjectConverter.mapCourseEntityToDTO(course)).thenReturn(detailDTO);
+
 
         CourseDetailDTO result = golfCourseService.getGolfCourseById(1L);
 
@@ -109,7 +112,7 @@ public class GolfCourseServiceTest {
 
     @Test
     void getGolfCourseByIdNotFound() {
-        when(courseRepository.findById(1L)).thenReturn(null);
+        when(courseRepository.findById(1L)).thenReturn(Optional.empty());
         when(golfCourseAPIClient.getGolfCourseById(1L)).thenReturn(null);
 
         CourseDetailDTO result = golfCourseService.getGolfCourseById(1L);

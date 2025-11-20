@@ -95,11 +95,12 @@ public class RoundService {
 
     public PlayedHoleDTO addShotToHole(Long roundId, Integer holeNumber, ShotDTO shotDTO) {
 
-        Round round = roundRepository.findById(roundId).orElseThrow(() -> new RuntimeException("Round not found"));
+        Round round = roundRepository.findById(roundId).orElseThrow(() ->
+                new MissingResourceException("Round not found", Round.class.getName(), roundId.toString()));
         PlayedHole playedHole = round.getHoles().get(holeNumber);
 
         if (playedHole == null) {
-            throw new IllegalStateException("Hole " + holeNumber + " does not exist for this round");
+            throw new MissingResourceException("Played Hole not found", PlayedHole.class.getName(), holeNumber.toString());
         }
 
         Shot newShot = converter.mapShotDTOToEntity(shotDTO, playedHole);
@@ -117,7 +118,7 @@ public class RoundService {
         PlayedHole playedHole = shotToUpdate.getPlayedHole();
 
         if (playedHole == null) {
-            throw new IllegalStateException("Played Hole does not exist for this round");
+            throw new MissingResourceException("Played Hole does not exist for this shot", PlayedHole.class.getName(), shotId.toString());
         }
 
         shotToUpdate.setClub(shotDTO.getClub());
@@ -136,7 +137,7 @@ public class RoundService {
         PlayedHole playedHole = shotToDelete.getPlayedHole();
 
         if (playedHole == null) {
-            throw new IllegalStateException("Played Hole does not exist for this round");
+            throw new MissingResourceException("Played hole is not attached to this shot", Shot.class.getName(), shotId.toString());
         }
 
         // 2. Remove the shot from the hole’s list
