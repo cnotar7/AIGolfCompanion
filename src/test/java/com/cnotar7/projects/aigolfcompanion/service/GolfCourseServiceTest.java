@@ -53,12 +53,12 @@ public class GolfCourseServiceTest {
 
         summaryDTO = CourseSummaryDTO.builder()
                 .id(1L)
-                .name("Arcadia Bluffs Gc")
+                .courseName("Arcadia Bluffs Gc")
                 .build();
 
         detailDTO = CourseDetailDTO.builder()
                 .id(1L)
-                .name("Arcadia Bluffs Gc")
+                .courseName("Arcadia Bluffs Gc")
                 .build();
 
     }
@@ -71,7 +71,7 @@ public class GolfCourseServiceTest {
 
         List<CourseSummaryDTO> result = golfCourseService.searchGolfCourse(query);
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("Arcadia Bluffs Gc");
+        assertThat(result.get(0).getCourseName()).isEqualTo("Arcadia Bluffs Gc");
         assertThat(result.get(0).getId()).isEqualTo(1L);
     }
 
@@ -90,7 +90,7 @@ public class GolfCourseServiceTest {
         when(golfCourseObjectConverter.mapCourseEntityToDTO(course)).thenReturn(detailDTO);
         CourseDetailDTO result = golfCourseService.getGolfCourseById(1L);
 
-        assertThat(result.getName()).isEqualTo("Arcadia Bluffs Gc");
+        assertThat(result.getCourseName()).isEqualTo("Arcadia Bluffs Gc");
         assertThat(result.getId()).isEqualTo(1L);
     }
 
@@ -106,7 +106,7 @@ public class GolfCourseServiceTest {
 
         CourseDetailDTO result = golfCourseService.getGolfCourseById(1L);
 
-        assertThat(result.getName()).isEqualTo("Arcadia Bluffs Gc");
+        assertThat(result.getCourseName()).isEqualTo("Arcadia Bluffs Gc");
         assertThat(result.getId()).isEqualTo(1L);
     }
 

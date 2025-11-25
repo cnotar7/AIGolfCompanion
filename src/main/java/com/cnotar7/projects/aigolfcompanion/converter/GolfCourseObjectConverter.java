@@ -12,7 +12,9 @@ import com.cnotar7.projects.aigolfcompanion.model.Tee;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class GolfCourseObjectConverter {
@@ -20,7 +22,8 @@ public class GolfCourseObjectConverter {
     public CourseDetailDTO mapCourseEntityToDTO(Course course) {
         CourseDetailDTO dto = CourseDetailDTO.builder()
                 .id(course.getId())
-                .name(course.getName())
+                .courseName(course.getName())
+                .clubName(course.getClubName())
                 .city(course.getCity())
                 .country(course.getCountry())
                 .address(course.getAddress())
@@ -70,13 +73,20 @@ public class GolfCourseObjectConverter {
                 .build();
 
         List<Tee> teeEntities = new ArrayList<>();
+        Set<String> teeNames = new HashSet<>();
         if (ext.getTees() != null) {
-            for (ExternalCourse.Tee t : ext.getTees().getFemale()) {
-                teeEntities.add(mapExternalTeeToEntity(t, course, Gender.FEMALE));
-            }
             for (ExternalCourse.Tee t : ext.getTees().getMale()) {
                 teeEntities.add(mapExternalTeeToEntity(t, course, Gender.MALE));
+                teeNames.add(t.getTee_name());
             }
+            for (ExternalCourse.Tee t : ext.getTees().getFemale()) {
+                if (!teeNames.contains(t.getTee_name())) {
+                    teeEntities.add(mapExternalTeeToEntity(t, course, Gender.FEMALE));
+                    teeNames.add(t.getTee_name());
+                }
+
+            }
+
         }
         course.setTees(teeEntities);
 
@@ -112,7 +122,8 @@ public class GolfCourseObjectConverter {
     public CourseSummaryDTO mapExternalCoursetoDTO(ExternalCourse ext) {
         return CourseSummaryDTO.builder()
                 .id(ext.getId())
-                .name(ext.getCourse_name())
+                .clubName(ext.getClub_name())
+                .courseName(ext.getCourse_name())
                 .city(ext.getLocation().getCity())
                 .state(ext.getLocation().getState())
                 .country(ext.getLocation().getCountry())

@@ -23,7 +23,7 @@ public class GolfCourseService {
         List<ExternalCourse> courses = golfCourseAPIClient.searchGolfCourse(query);
 
         for (ExternalCourse course : courses) {
-            System.out.println("Club Name = " + course.getClub_name() + ", ID = " + course.getId());
+            System.out.println("Course Name = " + course.getCourse_name() + ", ID = " + course.getId());
         }
 
         return courses.stream()
@@ -34,13 +34,14 @@ public class GolfCourseService {
     public CourseDetailDTO getGolfCourseById(Long id) {
         Course course = courseRepository.findById(id).orElse(null);
 
+
         // if course is not already stored, call golf course api for it
         if (course == null) {
-            System.out.println("Golf course with id = " + id + " not found");
+            System.out.println("Golf course with id = " + id + " not found in repository, calling golf course API.");
             ExternalCourse externalCourse = golfCourseAPIClient.getGolfCourseById(id);
             if (externalCourse != null) {
                 course = golfCourseObjectConverter.mapExternalCourseToEntity(externalCourse);
-                courseRepository.save(course);
+                course = courseRepository.save(course);
             } else {
                 return null;
             }

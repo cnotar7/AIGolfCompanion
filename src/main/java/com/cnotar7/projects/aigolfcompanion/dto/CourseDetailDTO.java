@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CourseDetailDTO {
     private Long id;
-    private String name;
+    private String clubName;
+    private String courseName;
     private String address;
     private String city;
     private String state;

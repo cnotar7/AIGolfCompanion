@@ -27,7 +27,7 @@ public class RoundController {
     }
 
     @GetMapping("/{roundId}")
-    public ResponseEntity<RoundResponseDTO> getRoundById(@PathVariable("roundId") Long roundId) {
+    public ResponseEntity<RoundResponseDTO> getRoundById(@PathVariable Long roundId) {
         RoundResponseDTO roundResponseDTO = roundService.getRoundById(roundId);
         if (roundResponseDTO == null) {
             return ResponseEntity.badRequest().build();

@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CourseSummaryDTO {
     private Long id;
-    private String name;
+    private String clubName;
+    private String courseName;
     private String city;
     private String state;
     private String country;
