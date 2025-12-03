@@ -1,23 +1,16 @@
 package com.cnotar7.projects.aigolfcompanion.converter;
 
-import com.cnotar7.projects.aigolfcompanion.dto.CourseDetailDTO;
-import com.cnotar7.projects.aigolfcompanion.dto.CourseSummaryDTO;
-import com.cnotar7.projects.aigolfcompanion.dto.HoleDTO;
-import com.cnotar7.projects.aigolfcompanion.dto.TeeDTO;
+import com.cnotar7.projects.aigolfcompanion.dto.*;
 import com.cnotar7.projects.aigolfcompanion.dto.external.ExternalCourse;
 import com.cnotar7.projects.aigolfcompanion.enums.Gender;
-import com.cnotar7.projects.aigolfcompanion.model.Course;
-import com.cnotar7.projects.aigolfcompanion.model.Hole;
-import com.cnotar7.projects.aigolfcompanion.model.Tee;
+import com.cnotar7.projects.aigolfcompanion.model.*;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
-public class GolfCourseObjectConverter {
+public class GolfObjectConverter {
 
     public CourseDetailDTO mapCourseEntityToDTO(Course course) {
         CourseDetailDTO dto = CourseDetailDTO.builder()
@@ -41,6 +34,7 @@ public class GolfCourseObjectConverter {
         return TeeDTO.builder()
                 .teeName(tee.getTeeName())
                 .courseRating(tee.getCourseRating())
+                .slopeRating(tee.getSlopeRating())
                 .totalYards(tee.getTotalYards())
                 .parTotal(tee.getParTotal())
                 .gender(tee.getGender())
@@ -100,6 +94,8 @@ public class GolfCourseObjectConverter {
                 .totalYards(t.getTotal_yards())
                 .gender(gender)
                 .course(course)
+                .courseRating(t.getCourse_rating())
+                .slopeRating(t.getSlope_rating())
                 .build();
 
         List<Hole> holeEntities = t.getHoles().stream()
@@ -129,4 +125,55 @@ public class GolfCourseObjectConverter {
                 .country(ext.getLocation().getCountry())
                 .build();
     }
+
+    public RoundDTO mapRoundEntityToDTO(Round round) {
+        return RoundDTO.builder()
+                .courseId(round.getCourse().getId())
+                .roundId(round.getId())
+                .teeId(round.getSelectedTee().getId())
+                .userName(round.getUser().getUsername())
+                .currentHoleNumber(round.getCurrentHoleNumber())
+                .startTime(round.getStartTime())
+                .completed(round.isCompleted())
+                .holes(round.getHoles().entrySet().stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                e -> mapPlayedHoleEntityToDTO(e.getValue())
+                        )))
+                .aiSummary(round.getAiSummary())
+                .build();
+    }
+    public PlayedHoleDTO mapPlayedHoleEntityToDTO(PlayedHole rh) {
+        return PlayedHoleDTO.builder()
+                .holeNumber(rh.getHoleNumber())
+                .par(rh.getPar())
+                .yardage(rh.getYardage())
+                .handicap(rh.getHandicap())
+                .strokes(rh.getStrokes())
+                .putts(rh.getPutts())
+                .completed(rh.isCompleted())
+                .shots(rh.getShots().stream()
+                        .map(this::mapShotEntityToDTO)
+                        .toList())
+                .build();
+    }
+
+    public ShotDTO mapShotEntityToDTO(Shot shot) {
+        return ShotDTO.builder()
+                .shotId(shot.getId())
+                .club(shot.getClub())
+                .shotNumber(shot.getShotNumber())
+                .result(shot.getResult())
+                .build();
+    }
+
+    public Shot mapShotDTOToEntity(ShotDTO shotDTO, PlayedHole playedHole) {
+        return Shot.builder()
+                .club(shotDTO.getClub())
+                .shotNumber(shotDTO.getShotNumber())
+                .result(shotDTO.getResult())
+                .playedHole(playedHole)
+                .build();
+    }
+
 }

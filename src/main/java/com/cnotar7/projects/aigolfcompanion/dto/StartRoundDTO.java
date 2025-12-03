@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class StartRoundDTO {
     private Long courseId;
-    private Long teeId;
+    private String teeName;
     private String courseName;
     private String userName;
 }

@@ -18,21 +18,22 @@ public class RoundController {
     private RoundService roundService;
 
     @PostMapping()
-    public ResponseEntity<RoundResponseDTO> startNewRound(@RequestBody StartRoundDTO startRoundDTO) {
-        RoundResponseDTO roundResponseDTO = roundService.startNewRound(startRoundDTO);
-        if (roundResponseDTO == null) {
+    public ResponseEntity<RoundDTO> startNewRound(@RequestBody StartRoundDTO startRoundDTO) {
+        System.out.println("startRoundDTO =  " + startRoundDTO);
+        RoundDTO roundDTO = roundService.startNewRound(startRoundDTO);
+        if (roundDTO == null) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(roundResponseDTO);
+        return ResponseEntity.ok(roundDTO);
     }
 
     @GetMapping("/{roundId}")
-    public ResponseEntity<RoundResponseDTO> getRoundById(@PathVariable Long roundId) {
-        RoundResponseDTO roundResponseDTO = roundService.getRoundById(roundId);
-        if (roundResponseDTO == null) {
+    public ResponseEntity<RoundDTO> getRoundById(@PathVariable Long roundId) {
+        RoundDTO roundDTO = roundService.getRoundById(roundId);
+        if (roundDTO == null) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(roundResponseDTO);
+        return ResponseEntity.ok(roundDTO);
     }
 
     @GetMapping("/{roundId}/holes/current")
@@ -56,42 +57,42 @@ public class RoundController {
     }
 
     @PostMapping("/{roundId}/holes/{holeNumber}/shots")
-    public ResponseEntity<PlayedHoleDTO> addShotToHole(
+    public ResponseEntity<RoundDTO> addShotToHole(
             @PathVariable Long roundId, @PathVariable @Min(1) @Max(18) Integer holeNumber, @RequestBody ShotDTO shotDTO) {
-        PlayedHoleDTO playedHole = roundService.addShotToHole(roundId, holeNumber, shotDTO);
+        RoundDTO roundDTO = roundService.addShotToHole(roundId, holeNumber, shotDTO);
 
-        return ResponseEntity.ok(playedHole);
+        return ResponseEntity.ok(roundDTO);
     }
 
     @PutMapping("/shots/{shotId}")
     public ResponseEntity<PlayedHoleDTO> updateShot(@PathVariable Long shotId, @RequestBody ShotDTO shotDTO) {
-        PlayedHoleDTO playedHole = roundService.updateShot(shotId, shotDTO);
-        return ResponseEntity.ok(playedHole);
+        PlayedHoleDTO playedHoleDTO = roundService.updateShot(shotId, shotDTO);
+        return ResponseEntity.ok(playedHoleDTO);
     }
 
     @DeleteMapping("/shots/{shotId}")
     public ResponseEntity<PlayedHoleDTO> deleteShot(@PathVariable Long shotId) {
-        PlayedHoleDTO playedHole = roundService.deleteShot(shotId);
+        PlayedHoleDTO playedHoleDTO = roundService.deleteShot(shotId);
 
-        return ResponseEntity.ok(playedHole);
+        return ResponseEntity.ok(playedHoleDTO);
     }
 
     @PostMapping("/{roundId}/holes/next")
-    public ResponseEntity<PlayedHoleDTO> moveToNextHole(@PathVariable Long roundId) {
-        PlayedHoleDTO nextHole = roundService.moveToNextHole(roundId);
-        return ResponseEntity.ok(nextHole);
+    public ResponseEntity<RoundDTO> moveToNextHole(@PathVariable Long roundId) {
+        RoundDTO roundDTO = roundService.moveToNextHole(roundId);
+        return ResponseEntity.ok(roundDTO);
     }
 
     @PostMapping("/{roundId}/holes/previous")
-    public ResponseEntity<PlayedHoleDTO> moveToPreviousHole(@PathVariable Long roundId) {
-        PlayedHoleDTO previousHole = roundService.moveToPreviousHole(roundId);
-        return ResponseEntity.ok(previousHole);
+    public ResponseEntity<RoundDTO> moveToPreviousHole(@PathVariable Long roundId) {
+        RoundDTO roundDTO = roundService.moveToPreviousHole(roundId);
+        return ResponseEntity.ok(roundDTO);
     }
 
     @PostMapping("/{roundId}/complete")
-    public ResponseEntity<RoundResponseDTO> completeRound(@PathVariable Long roundId) {
-        RoundResponseDTO roundResponseDTO = roundService.completeRound(roundId);
-        return ResponseEntity.ok(roundResponseDTO);
+    public ResponseEntity<RoundDTO> completeRound(@PathVariable Long roundId) {
+        RoundDTO roundDTO = roundService.completeRound(roundId);
+        return ResponseEntity.ok(roundDTO);
     }
 
 

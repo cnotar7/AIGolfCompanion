@@ -1,10 +1,12 @@
 package com.cnotar7.projects.aigolfcompanion.service;
 
-import com.cnotar7.projects.aigolfcompanion.converter.GolfRoundObjectConverter;
+import com.cnotar7.projects.aigolfcompanion.converter.GolfObjectConverter;
 import com.cnotar7.projects.aigolfcompanion.dto.*;
+import com.cnotar7.projects.aigolfcompanion.dto.external.ExternalCourse;
 import com.cnotar7.projects.aigolfcompanion.enums.Gender;
 import com.cnotar7.projects.aigolfcompanion.model.*;
 import com.cnotar7.projects.aigolfcompanion.repository.*;
+import com.cnotar7.projects.aigolfcompanion.service.api.GolfCourseAPIClient;
 import com.cnotar7.projects.aigolfcompanion.util.PlayerStatsCalculator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,20 +25,35 @@ public class RoundService {
     private ShotRepository shotRepository;
     private RoundSummaryService roundSummaryService;
     private PlayerStatsCalculator playerStatsCalculator;
-    private GolfRoundObjectConverter converter;
+    private GolfCourseAPIClient golfCourseAPIClient;
 
-    public RoundResponseDTO startNewRound(StartRoundDTO startRoundDTO) {
-        Course course = courseRepository.findById(startRoundDTO.getCourseId()).orElseThrow(() ->
-                new MissingResourceException("Course not found", Course.class.getName(), startRoundDTO.getCourseId().toString()));
+    private GolfObjectConverter converter;
 
-        User user = userRepository.findByUsername(startRoundDTO.getUserName()).orElseThrow(() ->
-                new MissingResourceException("User not found", User.class.getName(), startRoundDTO.getUserName())); // replace this with Auth
+    public RoundDTO startNewRound(StartRoundDTO startRoundDTO) {
+        Long id = startRoundDTO.getCourseId();
+        Course course = courseRepository.findById(id).orElse(null);
 
+        // if course is not already stored, call golf course api for it
+        if (course == null) {
+            System.out.println("Golf course with id = " + id + " not found in repository, calling golf course API.");
+            ExternalCourse externalCourse = golfCourseAPIClient.getGolfCourseById(id);
+            if (externalCourse != null) {
+                course = converter.mapExternalCourseToEntity(externalCourse);
+                course = courseRepository.save(course);
+            } else {
+                return null;
+            }
+        }
+
+        User user = userRepository.findByUsername(startRoundDTO.getUserName())
+                .orElse(User.builder().username(startRoundDTO.getUserName()).build()); // replace this with Auth
+
+        User savedUser = userRepository.save(user);
         Tee tee = course.getTees().stream()
-                .filter(t -> t.getId().equals(startRoundDTO.getTeeId()))
+                .filter(t -> t.getTeeName().equals(startRoundDTO.getTeeName()))
                 .findFirst()
                 .orElseThrow(() ->
-                        new MissingResourceException("Round not found", Round.class.getName(), startRoundDTO.getTeeId().toString()));
+                        new MissingResourceException("Tee not found", Tee.class.getName(), startRoundDTO.getTeeName()));
 
         LocalDateTime now = LocalDateTime.now();
         Round round = Round.builder()
@@ -45,7 +62,7 @@ public class RoundService {
                 .currentHoleNumber(1)
                 .course(course)
                 .selectedTee(tee)
-                .user(user)
+                .user(savedUser)
                 .build();
 
 
@@ -56,6 +73,8 @@ public class RoundService {
             PlayedHole playedHole = PlayedHole.builder()
                     .holeNumber(holeCounter)
                     .par(hole.getPar())
+                    .yardage(hole.getYardage())
+                    .handicap(hole.getHandicap())
                     .strokes(0)
                     .putts(0)
                     .completed(false)
@@ -72,7 +91,7 @@ public class RoundService {
         return converter.mapRoundEntityToDTO(savedRound);
     }
 
-    public RoundResponseDTO getRoundById(Long roundId) {
+    public RoundDTO getRoundById(Long roundId) {
         Round round = roundRepository.findById(roundId).orElseThrow(() ->
                 new MissingResourceException("Round not found", Round.class.getName(), roundId.toString()));
         return converter.mapRoundEntityToDTO(round);
@@ -93,7 +112,7 @@ public class RoundService {
     }
 
 
-    public PlayedHoleDTO addShotToHole(Long roundId, Integer holeNumber, ShotDTO shotDTO) {
+    public RoundDTO addShotToHole(Long roundId, Integer holeNumber, ShotDTO shotDTO) {
 
         Round round = roundRepository.findById(roundId).orElseThrow(() ->
                 new MissingResourceException("Round not found", Round.class.getName(), roundId.toString()));
@@ -107,8 +126,8 @@ public class RoundService {
         newShot.setPlayedHole(playedHole);
         playedHole.getShots().add(newShot);
 
-        playedholeRepository.save(playedHole);
-        return converter.mapPlayedHoleEntityToDTO(playedHole);
+        roundRepository.save(round);
+        return converter.mapRoundEntityToDTO(round);
     }
 
     public PlayedHoleDTO updateShot(Long shotId,  ShotDTO shotDTO) {
@@ -153,7 +172,7 @@ public class RoundService {
         return converter.mapPlayedHoleEntityToDTO(playedHole);
     }
 
-    public PlayedHoleDTO moveToNextHole(Long roundId) {
+    public RoundDTO moveToNextHole(Long roundId) {
         Round round = roundRepository.findById(roundId).orElseThrow(() ->
                 new MissingResourceException("Round not found", Round.class.getName(), roundId.toString()));
 
@@ -174,11 +193,11 @@ public class RoundService {
         round.setCurrentHoleNumber(currentHoleNumber);
         roundRepository.save(round);
 
-        return converter.mapPlayedHoleEntityToDTO(round.getHoles().get(currentHoleNumber));
+        return converter.mapRoundEntityToDTO(round);
 
     }
 
-    public PlayedHoleDTO moveToPreviousHole(Long roundId) {
+    public RoundDTO moveToPreviousHole(Long roundId) {
         Round round = roundRepository.findById(roundId).orElseThrow(() ->
                 new MissingResourceException("Round not found", Round.class.getName(), roundId.toString()));
 
@@ -199,11 +218,11 @@ public class RoundService {
         round.setCurrentHoleNumber(currentHoleNumber);
         roundRepository.save(round);
 
-        return converter.mapPlayedHoleEntityToDTO(round.getHoles().get(currentHoleNumber));
+        return converter.mapRoundEntityToDTO(round);
 
     }
 
-    public RoundResponseDTO completeRound(Long roundId) {
+    public RoundDTO completeRound(Long roundId) {
         /*
         Round round = roundRepository.findById(roundId).orElseThrow(() ->
                 new MissingResourceException("Round not found", Round.class.getName(), roundId.toString()));
@@ -233,7 +252,7 @@ public class RoundService {
         return converter.mapRoundEntityToDTO(round);
 
          */
-        return new RoundResponseDTO();
+        return new RoundDTO();
 
     }
 

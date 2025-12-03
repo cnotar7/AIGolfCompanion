@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ShotDTO {
+    private Long shotId;
     private String club;
     private int shotNumber;
     private String result;

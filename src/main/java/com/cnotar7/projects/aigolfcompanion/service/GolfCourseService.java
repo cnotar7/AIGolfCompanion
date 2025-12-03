@@ -1,6 +1,6 @@
 package com.cnotar7.projects.aigolfcompanion.service;
 
-import com.cnotar7.projects.aigolfcompanion.converter.GolfCourseObjectConverter;
+import com.cnotar7.projects.aigolfcompanion.converter.GolfObjectConverter;
 import com.cnotar7.projects.aigolfcompanion.dto.CourseDetailDTO;
 import com.cnotar7.projects.aigolfcompanion.model.Course;
 import com.cnotar7.projects.aigolfcompanion.repository.CourseRepository;
@@ -17,7 +17,7 @@ public class GolfCourseService {
 
     private final GolfCourseAPIClient golfCourseAPIClient;
     private final CourseRepository courseRepository;
-    private final GolfCourseObjectConverter golfCourseObjectConverter;
+    private final GolfObjectConverter golfObjectConverter;
 
     public List<CourseSummaryDTO> searchGolfCourse(String query) {
         List<ExternalCourse> courses = golfCourseAPIClient.searchGolfCourse(query);
@@ -27,7 +27,7 @@ public class GolfCourseService {
         }
 
         return courses.stream()
-                .map(golfCourseObjectConverter::mapExternalCoursetoDTO)
+                .map(golfObjectConverter::mapExternalCoursetoDTO)
                 .toList();
     }
 
@@ -40,15 +40,13 @@ public class GolfCourseService {
             System.out.println("Golf course with id = " + id + " not found in repository, calling golf course API.");
             ExternalCourse externalCourse = golfCourseAPIClient.getGolfCourseById(id);
             if (externalCourse != null) {
-                course = golfCourseObjectConverter.mapExternalCourseToEntity(externalCourse);
-                course = courseRepository.save(course);
+                course = golfObjectConverter.mapExternalCourseToEntity(externalCourse);
             } else {
                 return null;
             }
-
         }
 
-        return golfCourseObjectConverter.mapCourseEntityToDTO(course);
+        return golfObjectConverter.mapCourseEntityToDTO(course);
     }
 
 }

@@ -1,6 +1,6 @@
 package com.cnotar7.projects.aigolfcompanion.service;
 
-import com.cnotar7.projects.aigolfcompanion.converter.GolfRoundObjectConverter;
+import com.cnotar7.projects.aigolfcompanion.converter.GolfObjectConverter;
 import com.cnotar7.projects.aigolfcompanion.dto.*;
 import com.cnotar7.projects.aigolfcompanion.model.*;
 import com.cnotar7.projects.aigolfcompanion.repository.*;
@@ -41,7 +41,7 @@ public class RoundServiceTest {
     private PlayerStatsCalculator playerStatsCalculator;
 
     @Mock
-    private GolfRoundObjectConverter converter;
+    private GolfObjectConverter converter;
 
     @InjectMocks
     private RoundService roundService;
@@ -50,7 +50,7 @@ public class RoundServiceTest {
     User user;
     Round round;
     Map<Integer, PlayedHole> playedHoles;
-    RoundResponseDTO roundResponseDTO;
+    RoundDTO roundDTO;
     StartRoundDTO startRoundDTO;
     PlayedHoleDTO playedHoleDTO;
     ShotDTO shotDTO;
@@ -59,7 +59,7 @@ public class RoundServiceTest {
     @BeforeEach
     public void setUp() {
         startRoundDTO = StartRoundDTO.builder()
-                .teeId(3L)
+                .teeName("fake tee")
                 .courseId(1L)
                 .userName("admin")
                 .build();
@@ -115,11 +115,10 @@ public class RoundServiceTest {
         }
         round.setHoles(playedHoles);
 
-        roundResponseDTO = RoundResponseDTO.builder()
+        roundDTO = RoundDTO.builder()
                 .roundId(4L)
                 .courseId(course.getId())
                 .completed(false)
-                .courseName(course.getName())
                 .userName(user.getUsername())
                 .build();
 
@@ -149,12 +148,12 @@ public class RoundServiceTest {
         when(courseRepository.findById(startRoundDTO.getCourseId())).thenReturn(Optional.of(course));
         when(userRepository.findByUsername(startRoundDTO.getUserName())).thenReturn(Optional.of(user));
         when(roundRepository.save(any(Round.class))).thenReturn(round);
-        when(converter.mapRoundEntityToDTO(round)).thenReturn(roundResponseDTO);
+        when(converter.mapRoundEntityToDTO(round)).thenReturn(roundDTO);
 
-        RoundResponseDTO result = roundService.startNewRound(startRoundDTO);
+        RoundDTO result = roundService.startNewRound(startRoundDTO);
 
-        assertThat(result.getRoundId()).isEqualTo(roundResponseDTO.getRoundId());
-        assertThat(result.getCourseId()).isEqualTo(roundResponseDTO.getCourseId());
+        assertThat(result.getRoundId()).isEqualTo(roundDTO.getRoundId());
+        assertThat(result.getCourseId()).isEqualTo(roundDTO.getCourseId());
     }
 
     @Test
@@ -193,12 +192,12 @@ public class RoundServiceTest {
     public void getRoundByIdSuccess() {
         Long roundId = 1L;
         when(roundRepository.findById(roundId)).thenReturn(Optional.of(round));
-        when(converter.mapRoundEntityToDTO(round)).thenReturn(roundResponseDTO);
+        when(converter.mapRoundEntityToDTO(round)).thenReturn(roundDTO);
 
-        RoundResponseDTO result = roundService.getRoundById(roundId);
+        RoundDTO result = roundService.getRoundById(roundId);
 
-        assertThat(result.getRoundId()).isEqualTo(roundResponseDTO.getRoundId());
-        assertThat(result.getCourseId()).isEqualTo(roundResponseDTO.getCourseId());
+        assertThat(result.getRoundId()).isEqualTo(roundDTO.getRoundId());
+        assertThat(result.getCourseId()).isEqualTo(roundDTO.getCourseId());
 
     }
 
@@ -274,10 +273,9 @@ public class RoundServiceTest {
         when(converter.mapShotDTOToEntity(any(ShotDTO.class), any(PlayedHole.class))).thenReturn(shot);
         when(converter.mapPlayedHoleEntityToDTO(any(PlayedHole.class))).thenReturn(playedHoleDTO);
 
-        PlayedHoleDTO result = roundService.addShotToHole(roundId, holeNumber, shotDTO);
+        RoundDTO result = roundService.addShotToHole(roundId, holeNumber, shotDTO);
 
-        assertThat(result.getHoleNumber()).isEqualTo(holeNumber);
-        assertThat(result.getShots().size()).isEqualTo(1);
+        assertThat(result.getHoles().get(holeNumber).getShots().size()).isEqualTo(1);
     }
 
     @Test

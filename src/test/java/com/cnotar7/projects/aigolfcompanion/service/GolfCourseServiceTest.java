@@ -1,6 +1,6 @@
 package com.cnotar7.projects.aigolfcompanion.service;
 
-import com.cnotar7.projects.aigolfcompanion.converter.GolfCourseObjectConverter;
+import com.cnotar7.projects.aigolfcompanion.converter.GolfObjectConverter;
 import com.cnotar7.projects.aigolfcompanion.dto.CourseDetailDTO;
 import com.cnotar7.projects.aigolfcompanion.dto.CourseSummaryDTO;
 import com.cnotar7.projects.aigolfcompanion.dto.external.ExternalCourse;
@@ -30,7 +30,7 @@ public class GolfCourseServiceTest {
     private CourseRepository courseRepository;
 
     @Mock
-    private GolfCourseObjectConverter golfCourseObjectConverter;
+    private GolfObjectConverter golfObjectConverter;
 
     @InjectMocks
     private GolfCourseService golfCourseService;
@@ -67,7 +67,7 @@ public class GolfCourseServiceTest {
     void searchGolfCourse() {
         String query = "Arcadia";
         when(golfCourseAPIClient.searchGolfCourse(query)).thenReturn(List.of(externalCourse));
-        when(golfCourseObjectConverter.mapExternalCoursetoDTO(externalCourse)).thenReturn(summaryDTO);
+        when(golfObjectConverter.mapExternalCoursetoDTO(externalCourse)).thenReturn(summaryDTO);
 
         List<CourseSummaryDTO> result = golfCourseService.searchGolfCourse(query);
         assertThat(result).hasSize(1);
@@ -87,7 +87,7 @@ public class GolfCourseServiceTest {
     @Test
     void getGolfCourseByIdRepoFound() {
         when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
-        when(golfCourseObjectConverter.mapCourseEntityToDTO(course)).thenReturn(detailDTO);
+        when(golfObjectConverter.mapCourseEntityToDTO(course)).thenReturn(detailDTO);
         CourseDetailDTO result = golfCourseService.getGolfCourseById(1L);
 
         assertThat(result.getCourseName()).isEqualTo("Arcadia Bluffs Gc");
@@ -98,10 +98,10 @@ public class GolfCourseServiceTest {
     void getGolfCourseByIdAPIFound() {
         when(courseRepository.findById(1L)).thenReturn(Optional.empty());
         when(golfCourseAPIClient.getGolfCourseById(1L)).thenReturn(externalCourse);
-        when(golfCourseObjectConverter.mapExternalCourseToEntity(externalCourse)).thenReturn(course);
+        when(golfObjectConverter.mapExternalCourseToEntity(externalCourse)).thenReturn(course);
 
         when(courseRepository.save(course)).thenReturn(course);
-        when(golfCourseObjectConverter.mapCourseEntityToDTO(course)).thenReturn(detailDTO);
+        when(golfObjectConverter.mapCourseEntityToDTO(course)).thenReturn(detailDTO);
 
 
         CourseDetailDTO result = golfCourseService.getGolfCourseById(1L);

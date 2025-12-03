@@ -15,6 +15,8 @@ import java.util.List;
 public class PlayedHoleDTO {
     private int holeNumber;
     private int par;
+    private int yardage;
+    private int handicap;
     private int strokes;
     private int putts;
     private boolean completed;

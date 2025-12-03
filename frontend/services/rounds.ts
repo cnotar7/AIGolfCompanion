@@ -1,13 +1,15 @@
-import { PlayedHole, RoundResponse, Shot, StartRound } from "@/types/round";
+import { PlayedHole, Round, Shot, StartRound } from "@/types/round";
 import { api } from "./api";
 
 export async function startRound(startRound: StartRound) {
-  const res = await api.post<RoundResponse>(`/rounds`, { startRound });
+  console.log("StartRoundPayload: ", startRound);
+  const res = await api.post<Round>(`/rounds`, startRound);
+  console.log("After Calling StartRoundAPI");
   return res.data;
 }
 
 export async function getRound(roundId: number) {
-  const res = await api.get<RoundResponse>(`/rounds/${roundId}`);
+  const res = await api.get<Round>(`/rounds/${roundId}`);
   return res.data;
 }
 
@@ -18,6 +20,11 @@ export async function getCurrentHole(roundId: number) {
 
 export async function getSpecificHole(roundId: number, holeNumber: number) {
   const res = await api.get<PlayedHole>(`/rounds/${roundId}/holes/${holeNumber}`);
+  return res.data;
+}
+
+export async function addShot(roundId: number, holeNumber: number, shot: Shot) {
+  const res = await api.post(`/rounds/${roundId}/holes/${holeNumber}/shots`, shot);
   return res.data;
 }
 
